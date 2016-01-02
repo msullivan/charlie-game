@@ -3,13 +3,13 @@
   <head>
     <meta charset="utf-8"/>
     <title>Charlie's Game Demo</title>
-    <script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/fabric.js/1.5.0/fabric.min.js"></script>
-    <script type="text/javascript" src="game.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/1.5.0/fabric.min.js"></script>
+    <script type="text/javascript" src="tile.class.js"></script>
     <style type="text/css">
       canvas { border: 1px solid black; }
     </style>
   </head>
-  <body onload="init();">
+  <body>
     <canvas id="game" width="640" height="640"></canvas>
 
     <div style="display:none;">
@@ -19,4 +19,5 @@
       <img id="anims" src="images/32x32_orthogonal_0/scifi_effects_animated_Denzi130311-1.png">
     </div>
   </body>
+  <script type="text/javascript" src="game.js"></script>
 </html>
