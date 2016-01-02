@@ -1,4 +1,8 @@
 (function() {
+    /* "Most of what I want from jquery" */
+    var $ = function(s) { return document.getElementById(s); };
+
+    //////////// Constants and shit
 
     var tiles = {
         bareFloor: {set: 'tiles1', x: 3, y: 28},
@@ -14,15 +18,28 @@
         up:    {dx: 0, dy: -1, spriteOff: 3},
     };
 
-    // Some data
+
+    var movementTypes = {
+        person: { speed: 2, animRate: 3 }
+    };
+
 
     var TILE = 32;
     var X_TILES = 30;
     var Y_TILES = 15;
 
-    // Lol.
-    var game = {noobX: 9*TILE, noobY: 2*TILE, noobDir: 'down', noobSteps: 0};
+    /////////////// Globals?
 
+    // Lol.
+    var game = {noob: null, noobs: []};
+
+    // create a fabric wrapper around native canvas element.
+    // I use fabric but honestly I might as well not bother. I don't
+    // currently take advantage of its object model at /all/ and I
+    // had to write the Tile class since basically the only thing
+    // I am using canvas for wasn't supported so...
+    var canvas = this.__canvas = new fabric.StaticCanvas('game');
+    var audio = this.__audio = $("soundtrack");
 
     /////////////////////////////////////////////
 
@@ -33,7 +50,7 @@
         var width = spec.width || TILE;
         var height = spec.height || TILE;
 
-        var elem = document.getElementById(spec.set);
+        var elem = $(spec.set);
         return new fabric.Tile(elem, {
             left: x*TILE + dx,
             top: y*TILE + dy,
@@ -46,17 +63,66 @@
         });
     }
 
-    function spriteSpec(base, dir, steps) {
+    function spriteSpec(base, dir, stage) {
         return {
             set: base.set,
-            x: base.x + (steps % 3),
+            x: base.x + (stage % 3),
             y: base.y + directions[dir].spriteOff,
         };
     }
 
+    ////////////////////////////////////////////////////////////
+    Noob = fabric.util.createClass({
+        initialize: function(obj) {
+            this.moving = false;
+            this.steps = 0;
+            // Is this bullshit?
+            // {moving, steps, direction, px, py, sprite, movement}
+            for (elem in obj) this[elem] = obj[elem];
+        },
+
+        setDirection: function(direction) {
+            if (direction) {
+                this.direction = direction;
+                this.moving = true;
+            } else {
+                // Keep direction set, since we use it to pick sprites
+                this.moving = false;
+            }
+        },
+
+        move: function() {
+            if (this.moving) {
+                this.px += directions[this.direction].dx * this.movement.speed;
+                this.py += directions[this.direction].dy * this.movement.speed;
+                this.steps++;
+            }
+        },
+
+        render: function() {
+            //console.log(this);
+            var stage = Math.floor(this.steps / this.movement.animRate);
+            console.log(stage);
+            var sprite = spriteSpec(this.sprite, this.direction, stage);
+            return tile(sprite, 0, 0, this.px, this.py);
+        }
+
+    });
+
+    //////////////////////////////////////////////
+    function gameSetup() {
+        game.noob = new Noob({
+            px: 9*TILE, py: 2*TILE, direction: 'down',
+            sprite: tiles.mageSprite,
+            movement: movementTypes.person
+        });
+        game.noobs.push(game.noob);
+
+    }
+
+
+
     ///////////////////////////////////////////////
-    // create a wrapper around native canvas element (with id="c")
-    var canvas = this.__canvas = new fabric.StaticCanvas('game');
 
     function draw() {
         canvas.clear();
@@ -69,18 +135,19 @@
             }
         }
         //console.timeEnd("draw");
+        game.noobs.forEach(function (noob) { canvas.add(noob.render()); });
 
         // Draw dude
-        canvas.add(tile(spriteSpec(tiles.mageSprite, game.noobDir,
-                                   game.noobSteps),
-                        0, 0, game.noobX, game.noobY));
+        // canvas.add(tile(spriteSpec(tiles.mageSprite, game.noobDir,
+        //                            game.noobSteps),
+        //                 0, 0, game.noobX, game.noobY));
 
         //console.time("render");
         canvas.renderAll();
         //console.timeEnd("render");
     }
 
-    function getDirection() {
+    function getKbdDirection() {
         if (kd.W.isDown() || kd.UP.isDown()) return 'up';
         if (kd.A.isDown() || kd.LEFT.isDown()) return 'left';
         if (kd.D.isDown() || kd.RIGHT.isDown()) return 'right';
@@ -88,14 +155,10 @@
         return null;
     }
 
-    function loop() {
-        var dir = getDirection();
-        if (dir) {
-            game.noobDir = dir;
-            game.noobX += directions[dir].dx;
-            game.noobY += directions[dir].dy;
-            game.noobSteps++;
-        }
+    function tick() {
+        game.noob.setDirection(getKbdDirection());
+        game.noobs.forEach(function (noob) { noob.move(); });
+
 
         draw();
     }
@@ -125,12 +188,19 @@
     function init() {
         canvas.renderOnAddRemove = false;
 
-        kd.run(function () { kd.tick(); lol(); });
-        var stopRunning;
-        kd.T.press(function() { stopRunning(); });
+        gameSetup();
 
-        document.getElementById("loading").textContent = "";
-        stopRunning = runAtFramerate(loop, TILE);
+        audio.play();
+
+        kd.run(function () { kd.tick(); });
+        var stopRunning;
+        kd.T.press(function() {
+            audio.pause();
+            stopRunning();
+        });
+
+        $("loading").textContent = "";
+        stopRunning = runAtFramerate(tick, TILE);
     }
     window.onload = init;
 
