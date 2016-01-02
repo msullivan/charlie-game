@@ -55,6 +55,7 @@
 
 
     function init() {
+        document.getElementById("loading").textContent = "";
         draw();
     }
     window.onload = init;
