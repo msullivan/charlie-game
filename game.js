@@ -8,6 +8,7 @@
         bareFloor: {set: 'tiles1', x: 3, y: 28},
         simpleGrass: {set: 'tiles1', x: 20, y: 0},
         mageSprite: {set: 'chars', x: 0, y: 4},
+        fireball: {set: 'fireball', x: 0, y: 0},
     }
 
 
@@ -18,9 +19,9 @@
         up:    {dx: 0, dy: -1, spriteOff: 3},
     };
 
-
     var movementTypes = {
-        person: { speed: 2, animRate: 3 }
+        person: { speed: 2, animRate: 3 },
+        fireball: { speed: 5, animRate: 2 },
     };
 
 
@@ -81,6 +82,7 @@
             for (elem in obj) this[elem] = obj[elem];
         },
 
+
         setDirection: function(direction) {
             if (direction) {
                 this.direction = direction;
@@ -102,7 +104,6 @@
         render: function() {
             //console.log(this);
             var stage = Math.floor(this.steps / this.movement.animRate);
-            console.log(stage);
             var sprite = spriteSpec(this.sprite, this.direction, stage);
             return tile(sprite, 0, 0, this.px, this.py);
         }
@@ -118,8 +119,24 @@
         });
         game.noobs.push(game.noob);
 
+        kd.SPACE.press(function() { launchFireball(); });
     }
 
+    function launchFireball() {
+        var noob = game.noob;
+        var dir = directions[noob.direction];
+
+        // When facing sideways, make it line up with hands more.
+        var handShift = dir.dx != 0 ? 7 : 0;
+        var fireball = new Noob({
+            movement: movementTypes.fireball, sprite: tiles.fireball,
+            direction: noob.direction,
+            moving: true,
+            px: noob.px + dir.dx*(TILE/2),
+            py: noob.py + dir.dy*(TILE/2 + 3) + handShift,
+        });
+        game.noobs.push(fireball);
+    }
 
 
     ///////////////////////////////////////////////
