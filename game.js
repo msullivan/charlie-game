@@ -144,24 +144,18 @@
     function draw() {
         canvas.clear();
 
-        //console.time("draw");
         // Draw floor
         for (var x = 0; x < X_TILES; x++) {
             for (var y = 0; y < Y_TILES; y++) {
                 canvas.add(tile(tiles.simpleGrass, x, y));
             }
         }
-        //console.timeEnd("draw");
+
+        // Sort by y as a painters algorithm type thing.
+        game.noobs.sort(function (n1, n2) { return n1.py - n2.py; });
         game.noobs.forEach(function (noob) { canvas.add(noob.render()); });
 
-        // Draw dude
-        // canvas.add(tile(spriteSpec(tiles.mageSprite, game.noobDir,
-        //                            game.noobSteps),
-        //                 0, 0, game.noobX, game.noobY));
-
-        //console.time("render");
         canvas.renderAll();
-        //console.timeEnd("render");
     }
 
     function getKbdDirection() {
