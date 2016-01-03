@@ -18,7 +18,7 @@
     };
 
     var TILE = 32;
-    var X_TILES = 30;
+    var X_TILES = 20;
     var Y_TILES = 15;
 
     /////////////// Globals?
@@ -108,7 +108,7 @@
     //////////////////////////////////////////////
     function gameSetup() {
         game.noob = new Noob({
-            px: 9*TILE, py: 2*TILE, direction: 'down',
+            px: 9*TILE, py: 5*TILE, direction: 'down',
             sprite: tiles.mageSprite,
             movement: movementTypes.person
         });
@@ -135,19 +135,31 @@
 
 
     ///////////////////////////////////////////////
+    function getTiles(abbrevs, key) {
+        var l = abbrevs[key];
+        if (typeof l === 'undefined' || !l) return [];
+        return Array.isArray(l) ? l : [l];
+    }
+
+    function drawMap(map) {
+        var abbrevs = gameContent[map.abbrevs];
+        // Draw floor
+        for (var x = 0; x < X_TILES; x++) {
+            for (var y = 0; y < Y_TILES; y++) {
+                var objs = getTiles(abbrevs, map.map[y][x]);
+                for (var i = 0; i < objs.length; i++) {
+                    //console.log(x + "," + y + ": " + map.map[y][x] + " " +
+                    //            objs[i] + " " + tiles[objs[i]]);
+                    canvas.add(tile(tiles[objs[i]], x, y));
+                }
+            }
+        }
+    }
 
     function draw() {
         canvas.clear();
 
-        // Draw floor
-        for (var x = 0; x < X_TILES; x++) {
-            for (var y = 0; y < Y_TILES; y++) {
-                var floor = tiles.bareFloor1;
-                var t = { set: floor.set,
-                          x: floor.x + (x % 3), y: floor.y + (y % 2) };
-                canvas.add(tile(t, x, y));
-            }
-        }
+        drawMap(gameContent.testMap);
 
         // Sort by y as a painters algorithm type thing.
         game.noobs.sort(function (n1, n2) { return n1.py - n2.py; });
