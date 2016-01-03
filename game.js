@@ -27,7 +27,7 @@
     var $ = function(s) { return document.getElementById(s); };
 
     // Lol.
-    var game = {noob: null, noobs: []};
+    var game = {noob: null, noobs: [], audioOn: true};
 
     // create a fabric wrapper around native canvas element.
     // I use fabric but honestly I might as well not bother. I don't
@@ -203,10 +203,16 @@
 
         kd.run(function () { kd.tick(); });
         var stopRunning;
-        kd.T.press(function() {
+        kd.Q.press(function() {
             audio.pause();
             stopRunning();
         });
+
+        kd.M.press(function() {
+            game.audioOn = !game.audioOn;
+            audio.volume = game.audioOn ? 1 : 0;
+        });
+
 
         $("loading").textContent = "";
         stopRunning = runAtFramerate(tick, TILE);
