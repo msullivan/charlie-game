@@ -19,6 +19,7 @@
         bottomLeftWallOverlay: {set: "tiles1", x: 3, y: 29},
         bottomRightWallOverlay: {set: "tiles1", x: 4, y: 29},
 
+        blank1: {set: "tiles1", x: 14, y: 8},
         blank: {set: "tiles2", x: 4, y: 21},
 
         simpleGrass: {set: "tiles1", x: 20, y: 0},

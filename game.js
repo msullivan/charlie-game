@@ -137,7 +137,7 @@
     ///////////////////////////////////////////////
     function getTiles(abbrevs, key) {
         var l = abbrevs[key];
-        if (typeof l === 'undefined' || !l) return [];
+        if (!l) return [];
         return Array.isArray(l) ? l : [l];
     }
 
