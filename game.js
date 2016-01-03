@@ -1,16 +1,26 @@
 (function() {
-    /* "Most of what I want from jquery" */
-    var $ = function(s) { return document.getElementById(s); };
-
-    //////////// Constants and shit
-
+    //////////// Content?
     var tiles = {
-        bareFloor: {set: 'tiles1', x: 3, y: 28},
+        bareFloor1: {set: 'tiles2', x: 0, y: 20},
+        bareFloor2: {set: 'tiles2', x: 1, y: 20},
+        bareFloor3: {set: 'tiles2', x: 2, y: 20},
+        bareFloor4: {set: 'tiles2', x: 0, y: 21},
+        bareFloor5: {set: 'tiles2', x: 1, y: 21},
+        bareFloor6: {set: 'tiles2', x: 2, y: 21},
+
+
         simpleGrass: {set: 'tiles1', x: 20, y: 0},
         mageSprite: {set: 'chars', x: 0, y: 4},
         fireball: {set: 'fireball', x: 0, y: 0},
     }
 
+    var movementTypes = {
+        person: { speed: 2, animRate: 3 },
+        fireball: { speed: 5, animRate: 2 },
+    };
+
+
+    //////////// Constants and shit
 
     var directions = {
         down:  {dx: 0, dy: 1, spriteOff: 0},
@@ -19,17 +29,14 @@
         up:    {dx: 0, dy: -1, spriteOff: 3},
     };
 
-    var movementTypes = {
-        person: { speed: 2, animRate: 3 },
-        fireball: { speed: 5, animRate: 2 },
-    };
-
-
     var TILE = 32;
     var X_TILES = 30;
     var Y_TILES = 15;
 
     /////////////// Globals?
+
+    /* "Most of what I want from jquery" */
+    var $ = function(s) { return document.getElementById(s); };
 
     // Lol.
     var game = {noob: null, noobs: []};
@@ -147,7 +154,10 @@
         // Draw floor
         for (var x = 0; x < X_TILES; x++) {
             for (var y = 0; y < Y_TILES; y++) {
-                canvas.add(tile(tiles.simpleGrass, x, y));
+                var floor = tiles.bareFloor1;
+                var t = { set: floor.set,
+                          x: floor.x + (x % 3), y: floor.y + (y % 2) };
+                canvas.add(tile(t, x, y));
             }
         }
 
